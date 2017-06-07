@@ -7,7 +7,7 @@ Author CYann
 
 ## Background / 背景
 ###研究背景
-   从Graphql的技术研究是从离开大作业小组之后选择研究的技术，由于之前功夫的白费，所以在选题上也是尽量选择轻量级的、易理解的技术方面。在阅读完 [500Line-Dagoba: an in-memory graph database](http://www.aosabook.org/en/500L/dagoba-an-in-memory-graph-database.html) 之后，结合现如今的大数据趋势，我逐渐对 图数据库 `Graph Database`  产生了浓厚的兴趣.渐渐的，了解了`JavaScript` 前端的目前的技术，决定研究`GraphQL` 。
+   从Graphql的技术研究是从离开大作业小组之后选择研究的技术，由于之前功夫的白费，所以在选题上也是尽量选择轻量级的、易理解的技术方面。在阅读完 [500 Lines or less -Dagoba: an in-memory graph database](http://www.aosabook.org/en/500L/dagoba-an-in-memory-graph-database.html) 之后，结合现如今的大数据趋势，我逐渐对 图数据库 `Graph Database`  产生了浓厚的兴趣.渐渐的，了解了`JavaScript` 前端的目前的技术，决定研究`GraphQL` 。后续发现 `` Graph Database`` 其实和本文所说的`GraphQL` 不是一个概念
 
 ### 研究日记
 
