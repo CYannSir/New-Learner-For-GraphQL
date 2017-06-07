@@ -13,11 +13,13 @@ Author CYann
 
 2017-6-5-早 建立`Github`项目库和初始化，编写初步的`Readme`，并进行与 `VS Code` Git 的连接和测试
 2017-6-5-中 开始尝试对于`GraphQL本地服务器的搭建`，使用的系统为`Windows 10`
-2017-6-6-A 无法搭建该本地服务器，尝试使用`Ubuntu 16.04`系统搭建该本地服务器 
+2017-6-6-A Windows 10上无法搭建该本地服务器，尝试使用`Ubuntu 16.04`系统搭建该本地服务器 
 
 ###技术背景
 
 
 
 ##Introduction / 简介
+
+##Writing code for a Demo / 测试Demo编写
 
