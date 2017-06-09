@@ -42,9 +42,7 @@ Author CYann
 
 ​	在2016，```Github```宣布开放了一套使用```GraphQL```开发的公共```API``` [2]
 
-	>We’ve often heard that our REST API was an inspiration for other companies; countless tutorials refer to our endpoints. Today, we’re excited to announce our biggest change to the API since we snubbed XML in favor of JSON: we’re making the GitHub API available through GraphQL.
-	>
-	>​																		——Github
+> We’ve often heard that our REST API was an inspiration for other companies; countless tutorials refer to our endpoints. Today, we’re excited to announce our biggest change to the API since we snubbed XML in favor of JSON: we’re making the GitHub API available through GraphQL.																		                                                                                                                                      ——Github
 
 
 
