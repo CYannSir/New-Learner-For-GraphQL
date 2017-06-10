@@ -5,9 +5,9 @@ Author CYann
 
 ![](D:\CYann_Work\Js_GraphQL\rec\GraphQL Logo.png)
 
-##Overview / 前瞻
+##前瞻 / Overview 
 
-## Background / 背景
+## 背景 / Background
 
 ###研究背景
 
@@ -55,21 +55,21 @@ Author CYann
 
 
 
-##Introduction / 简介
+##简介 / Introduction  
 ​       GraphQL是一种查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序
 
 
 https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
 
-##Writing code for a Demo / 测试Demo编写
-###Prerequisites / 前提
+##测试Demo编写 / Writing code for a Demo 
+###前提 / Prerequisites 
 ​       环境搭建需要有```Node v6```以上的版本安装在机子上。接着需要在你的电脑上创建一个新的工程文件夹，之后在该目录下安装```GraphQL.js``` 。[注意：使用终端或者Win+R cmd]
 ```
 npm init
 npm install graphql --save
 ```
 ![](D:\CYann_Work\Js_GraphQL\rec\2.png)
-###Writing Code / 简单实现GraphQL
+### 简单实现GraphQL / Writing Code 
 ​       编写程序“Hello World” ：新建一个文件```server.js``` ,在这个文件里，我们需要定义一个```schema```定义出一个```Query``` 类型，同时需要一个```API root``` ，每个API的节点都需要一个```resolver```的函数。  
 ```server.js```
 ```javascript
@@ -104,7 +104,7 @@ node server.js
 ```
 ![](D:\CYann_Work\Js_GraphQL\rec\1.png)
 
-###Writing Code / 简单实现GraphQL服务器
+### 简单实现GraphQL服务器 /  Writing Code 
 ​      使用```Express``` 是最简单的方式去运行
 ```
 npm install express express-graphql --save
@@ -148,7 +148,7 @@ node server.js
 ![](D:\CYann_Work\Js_GraphQL\rec\4. 服务器运行.png) 
 ![](D:\CYann_Work\Js_GraphQL\rec\4 服务器搭建.png)
 
-###Writing Code / 简单实现GraphQL客户端
+###简单实现GraphQL客户端 / Writing Code 
 ​      我们先像以上的步骤部署出一个```GraphQL server``` 地址为```http://localhost:4000/graphql``` ,我们可以将我们想要查询的写进```terminal```，例子如下：
 ```
 curl -X POST \
@@ -180,10 +180,108 @@ data returned: Object { hello: "Hello world!" }
 ```
 ![](D:\CYann_Work\Js_GraphQL\rec\5 console模拟客户端.png) 
 
+### 简单实现GraphQL的参数传递 / Writing Code 
+​      首先是创建一个```Schema``` ，如下：
+```graphql
+type Query {
+  rollDice(numDice: Int!, numSides: Int): [Int]
+}
+```
+​      上述代码中```Int!``` 指的是```numDice``` 不能为空。（PS：这样的好处是在后期处理数据的时候，我们可以少掉一些数据的验证逻辑） 
+​      当```root resolver``` 函数有带参数，那么就会把第一个参数传给函数，所以进行对之前的```server.js``` 的```root resolver```进行修改，如下：
+```javascript
+var root = {
+  rollDice: function (args) {
+    var output = [];
+    for (var i = 0; i < args.numDice; i++) {
+      output.push(1 + Math.floor(Math.random() * (args.numSides || 6)));
+    }
+    return output;
+  }
+};
+```
+​      当然使用 [ES6 destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)来定义这些参数，可以将上面的代码进行优化，如下：
+```javascript
+var root = {
+  rollDice: function ({numDice, numSides}) {
+    var output = [];
+    for (var i = 0; i < numDice; i++) {
+      output.push(1 + Math.floor(Math.random() * (numSides || 6)));
+    }
+    return output;
+  }
+};
+```
+​      将以上修改成的```server.js``` ，完整的代码如下：
+```javascript
+/**
+ * 复杂的传参测试server.js
+ */
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
 
+//建立一个Schema ， 使用Graphql Schema 语言
+var schema = buildSchema(`
+  type Query {
+    rollDice(numDice: Int!, numSides: Int): [Int]
+  }
+`);
 
+//root对每一个API断点都提供了一个resolver功能
+var root = {
+  rollDice: function ({numDice, numSides}) {
+    var output = [];
+    for (var i = 0; i < numDice; i++) {
+      output.push(1 + Math.floor(Math.random() * (numSides || 6)));
+    }
+    return output;
+  }
+};
 
-##Summarize / 总结
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at localhost:4000/graphql');
+```
+​      修改后的```server.js``` ，执行，并使用浏览器打开```http://localhost:4000/graphql```,之后进行```GraphQL query```
+```
+node server.js
+```
+```graphql
+{
+  rollDice(numDice: 3, numSides: 6)
+}
+```
+![](D:\CYann_Work\Js_GraphQL\rec\7.png) 
+
+​      在```GraphQL Client```使用```$```符号进行传值，如下：
+```javascript
+var dice = 3;
+var sides = 6;
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open("POST", "/graphql");
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Accept", "application/json");
+xhr.onload = function () {
+  console.log('data returned:', xhr.response);
+}
+var query = `query RollDice($dice: Int!, $sides: Int) {
+  rollDice(numDice: $dice, numSides: $sides)
+}`;
+xhr.send(JSON.stringify({
+  query: query,
+  variables: { dice: dice, sides: sides },
+}));
+```
+![](D:\CYann_Work\Js_GraphQL\rec\7-2.png) 
+
+##总结 / Summarize  
 
 ---
 ***
