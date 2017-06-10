@@ -5,7 +5,10 @@ Author CYann
 
 ![](D:\CYann_Work\Js_GraphQL\rec\GraphQL Logo.png)
 
+##Overview / 前瞻
+
 ## Background / 背景
+
 ###研究背景
 
 ​        从Graphql的技术研究是从离开大作业小组之后选择研究的技术，由于之前功夫的白费，所以在选题上也是尽量选择轻量级的、易理解的技术方面。在阅读完 [500 Lines or less -Dagoba: an in-memory graph database](http://www.aosabook.org/en/500L/dagoba-an-in-memory-graph-database.html) 之后，结合现如今的大数据趋势，我逐渐对 图数据库 `Graph Database`  产生了浓厚的兴趣.渐渐的，了解了`JavaScript` 前端的目前的技术，决定研究`GraphQL` 。后续发现 `` Graph Database`` 其实和本文所说的`GraphQL` 不是一个概念
@@ -47,10 +50,57 @@ Author CYann
 
 
 ##Introduction / 简介
+​       GraphQL是一种查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序
+
 
 https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
 
 ##Writing code for a Demo / 测试Demo编写
+###Prerequisites / 前提
+​       环境搭建需要有```Node v6```以上的版本安装在机子上。接着需要在你的电脑上创建一个新的工程文件夹，之后在该目录下安装```GraphQL.js``` 。[注意：使用终端或者Win+R cmd]
+```
+npm init
+npm install graphql --save
+```
+###Writing Code / 简单实现GraphQL
+​       编写程序“Hello World” ：新建一个文件```server.js``` ,在这个文件里，我们需要定义一个```schema```定义出一个```Query``` 类型，同时需要一个```API root``` ，每个API的节点都需要一个```resolver```的函数。  
+```server.js```
+```javascript
+var { graphql, buildSchema } = require('graphql');
+
+// 构造出一个schema，包含Query类型
+var schema = buildSchema(`
+  type Query {
+    hello: String
+  }
+`);
+
+// API root 为每一个节点提供了一个resolver的函数
+var root = {
+  hello: () => {
+    return 'Hello world!';
+  },
+};
+
+// 执行查询语句query '{ hello }'，并且打印结果
+graphql(schema, '{ hello }', root).then((response) => {
+  console.log(response);
+});
+```
+​      接着，运行该文件
+```
+node server.js
+```
+​      运行得到的结果：
+```json
+{ data: { hello: 'Hello world!' } }
+```
+###Writing Code / 简单实现GraphQL服务器
+​      使用```Express``` 是最简单的方式去运行
+```
+npm install express express-graphql --save
+```
+
 
 ##Summarize / 总结
 
