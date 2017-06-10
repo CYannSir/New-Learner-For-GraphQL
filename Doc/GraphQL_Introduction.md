@@ -25,6 +25,12 @@ Author CYann
 
 ​	2017-6-8-晚 对`GraphQL`所有文献进行细致的阅读，获取关键性的信息和知识
 
+​	2017-6-9-晚 对```GraphQL``` 官方文档进行细致翻译和研究
+
+​	2017-6-10-A
+
+​	2017-6-11-A
+
 ###技术背景
 
 ​        在 2015 React 欧洲大会上，Lee Byron 介绍了 Facebook 的 GraphQL ，包含 GraphQL 背后的故事，查询语句的示例，还有核心的概念。  
@@ -43,7 +49,7 @@ Author CYann
 
 ​	三年前，Facebook 用了 ```GraphQL``` 做了第一款真正的本地移动应用，现在，应用每天会接受 260 亿的请求。[1]
 
-​	在2016，```Github```宣布开放了一套使用```GraphQL```开发的公共```API``` [2]
+​	在2016，```Github```宣布开放了一套使用```GraphQL```开发的公共```API``` [2]，以下为```Github``` 宣布使用```GraphQL``` 的告示：
 
 > We’ve often heard that our REST API was an inspiration for other companies; countless tutorials refer to our endpoints. Today, we’re excited to announce our biggest change to the API since we snubbed XML in favor of JSON: we’re making the GitHub API available through GraphQL.																		                                                                                                                                      ——Github
 
@@ -62,6 +68,7 @@ https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
 npm init
 npm install graphql --save
 ```
+![](D:\CYann_Work\Js_GraphQL\rec\2.png)
 ###Writing Code / 简单实现GraphQL
 ​       编写程序“Hello World” ：新建一个文件```server.js``` ,在这个文件里，我们需要定义一个```schema```定义出一个```Query``` 类型，同时需要一个```API root``` ，每个API的节点都需要一个```resolver```的函数。  
 ```server.js```
@@ -95,11 +102,85 @@ node server.js
 ```json
 { data: { hello: 'Hello world!' } }
 ```
+![](D:\CYann_Work\Js_GraphQL\rec\1.png)
+
 ###Writing Code / 简单实现GraphQL服务器
 ​      使用```Express``` 是最简单的方式去运行
 ```
 npm install express express-graphql --save
 ```
+![](D:\CYann_Work\Js_GraphQL\rec\3 截取部分.png) 
+​      在以上`HelloWorld` 的基础上，进行部分的修改，使得可以使用`express` 来运行一个网络服务并且替代直接调用`GraphQL`函数执行查询，使用`express-graphql`部署`GraphQL Api Server` 在`"/graphql"`的HTTP的节点上
+
+```javascript
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+// 构造出一个schema，包含Query类型
+var schema = buildSchema(`
+  type Query {
+    hello: String
+  }
+`);
+
+
+// API root 为每一个节点提供了一个resolver的函数
+var root = {
+  hello: () => {
+    return 'Hello world!';
+  },
+};
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at localhost:4000/graphql');
+```
+​      通过运行以下命令开启一个```http://localhost:4000/graphql``` ,如果你使用```Chrome```或者其他web浏览器，你就可以看到一个可以键入你的查询请求的一个接口网站
+```
+node server.js
+```
+![](D:\CYann_Work\Js_GraphQL\rec\4. 服务器运行.png) 
+![](D:\CYann_Work\Js_GraphQL\rec\4 服务器搭建.png)
+
+###Writing Code / 简单实现GraphQL客户端
+​      我们先像以上的步骤部署出一个```GraphQL server``` 地址为```http://localhost:4000/graphql``` ,我们可以将我们想要查询的写进```terminal```，例子如下：
+```
+curl -X POST \
+-H "Content-Type: application/json" \
+-d '{"query": "{ hello }"}' \
+http://localhost:4000/graphql
+```
+​      上述的输出将是以```JSON``` 的形式
+```JSON
+{"data":{"hello":"Hello world!"}}
+```
+
+​      当然，也可以通过浏览器进行发送```GraphQL``` 。先打开```http://localhost:4000```并且打开```开发者工具(快捷键：F12)```，
+输入以下代码：
+```javascript
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open("POST", "/graphql");
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Accept", "application/json");
+xhr.onload = function () {
+  console.log('data returned:', xhr.response);
+}
+xhr.send(JSON.stringify({query: "{ hello }"}));
+```
+​      你将看到返回的数据，如下：
+```javascript
+data returned: Object { hello: "Hello world!" }
+```
+![](D:\CYann_Work\Js_GraphQL\rec\5 console模拟客户端.png) 
+
+
 
 
 ##Summarize / 总结
@@ -110,7 +191,7 @@ npm install express express-graphql --save
    发布时间 2015-08-17  更新时间  2016-10-08
 2. 作者 局长 文章名称[Github 为什么开放了一套 GraphQL 版本的 API](http://www.oschina.net/news/78302/why-github-open-graphql-api)
    发布时间2016-10-23
-3. 
+3. Github 项目名称：[graphql.github.io](https://github.com/graphql/graphql.github.io)  ， 内有Facebook提供的```GraphQL``` 官方文档
 
 
 
