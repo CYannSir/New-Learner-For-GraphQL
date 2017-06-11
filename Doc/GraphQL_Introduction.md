@@ -1,19 +1,20 @@
 # GraphQL
 
-Author CYann
+Author :  CYann
+No : 31401417
+Teacher: Huomm
+Publication time : 2017-06-11
 >积一时之跬步，臻千里之遥程
 
 ![](D:\CYann_Work\Js_GraphQL\rec\GraphQL Logo.png)
 
-##前瞻 / Overview 
-
 ## 背景 / Background
 
-###研究背景
+###研究背景 / Story 
 
 ​        从Graphql的技术研究是从离开大作业小组之后选择研究的技术，由于之前功夫的白费，所以在选题上也是尽量选择轻量级的、易理解的技术方面。在阅读完 [500 Lines or less -Dagoba: an in-memory graph database](http://www.aosabook.org/en/500L/dagoba-an-in-memory-graph-database.html) 之后，结合现如今的大数据趋势，我逐渐对 图数据库 `Graph Database`  产生了浓厚的兴趣.渐渐的，了解了`JavaScript` 前端的目前的技术，决定研究`GraphQL` 。后续发现 `` Graph Database`` 其实和本文所说的`GraphQL` 不是一个概念
 
-### 研究日记
+### 研究日记 / Diary
 
 ​	2017-6-5-早 建立`Github`项目库和初始化，编写初步的`Readme`，并进行与 `VS Code` Git 的连接和测试
 
@@ -33,7 +34,7 @@ Author CYann
 
 ​	2017-6-12-M 答辩
 
-###技术背景
+###技术背景 / History of GraphQL
 ####Web早期
 ​        早期的Web应用就是```静态HTML文档```。演化到网站想包含存在数据库（例如SQL）里的动态内容，并通过```JavaScript```来添加交互功能。绝大多数的Web内容都通过桌面电脑的Web浏览器来访问的，看起来一切都很美好
 ![](D:\CYann_Work\Js_GraphQL\rec\web早期.png)
@@ -398,7 +399,13 @@ fragment friendFields on User {
 }
 ```
 ​      使用片段时需要加上```...```操作符表示展开片段内容
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\fragment.png)
+```markdown
+Fragment name: 每个片段的名字有一个graphql文件内是独一无二的。这是用于引用操作中或其他片段中的片段的名称。碎片名称也可以用于服务器端日志记录，类似于操作名，因此我们建议使用显式和有意义的名称。如果你把你的片段命名得很好，你可以追踪你的代码中哪一部分定义了这个片段，如果你想优化你以后的数据。
+Type condition: graphql操作总是在查询(query)，更改(mutation)，或订阅(subscription)类型在您的架构，但片段可以用于任何选择集。因此，为了孤立地对您的模式进行验证，您需要指定它可以使用的类型，这就是类型条件出现的地方。
+```
 ​      内联片段
+
 ```graphql
 query inlineFragmentTyping {
   profiles(handles: ["zuck", "cocacola"]) {
@@ -415,6 +422,12 @@ query inlineFragmentTyping {
     }
   }
 }
+```
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\inlineframent.png)
+```markdown
+Fragment spread: 当你使用一个片段里面的一个操作或另一个片段，你把“…”接着是片段名。这称为片段扩展，它可以出现在与命名的片段类型条件匹配的任何选择集中
+
+Inline fragment: 当您只需根据结果的类型执行某些字段，但不希望将其拆分为单独的定义时，可以使用内联片段。这就像一个命名的片段，但作为查询的一部分被编写。内联片段的一个区别是它们实际上不需要有一个类型条件，并且可以只使用一个指令使用，我们在下面的例子中会看到。
 ```
 ​      内联片段在单个查询上会比较方便，
 ​      外联片段在多个查询上更简洁，易明白
@@ -743,10 +756,10 @@ xhr.send(JSON.stringify({
 
 ---
 ***
-1. 作者 王皓 文章名称 [GraphQL 介绍](https://ninghao.net/blog/2857)  
+1. 作者 王皓 文章名称 ：[GraphQL 介绍](https://ninghao.net/blog/2857)  
    发布时间： 2015-08-17  更新时间：  2016-10-08
 
-2. 作者 局长 文章名称[Github 为什么开放了一套 GraphQL 版本的 API](http://www.oschina.net/news/78302/why-github-open-graphql-api)
+2. 作者 局长 文章名称：[Github 为什么开放了一套 GraphQL 版本的 API](http://www.oschina.net/news/78302/why-github-open-graphql-api)
    发布时间：2016-10-23
 
 3. Github 项目名称：[graphql.github.io](https://github.com/graphql/graphql.github.io)  ， 内有Facebook提供的```GraphQL``` 官方文档
