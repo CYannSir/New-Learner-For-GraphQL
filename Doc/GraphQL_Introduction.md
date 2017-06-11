@@ -29,7 +29,9 @@ Author CYann
 
 ​	2017-6-10-A 写入测试Demo
 
-​	2017-6-11-A
+​	2017-6-11-A 写入所有基础知识，编写答辩PPT
+
+​	2017-6-12-M 答辩
 
 ###技术背景
 ####Web早期
@@ -241,17 +243,32 @@ mutation：获取数据后还有写操作的请求
 ```
 
 ​      这边引用了```APOLLO 社区```博主的文章内容[7]，来更好的理解关键的语法点（PS：纯个人翻译，翻译错误，请指出）：
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\query query.png)
+```markdown
+Field: 请求的数据单位，它最终作为JSON响应数据中的一个字段。
+
+Arguments: 连接到特定字段的一组键值对。这些被传递到这个字段的服务器端执行，并影响它如何解决。参数可以是文字值，如上面的查询或变量。注意，参数可以出现在任何字段上，甚至可以在操作中嵌套在字段中。
+```
 ![解释图解](D:\CYann_Work\Js_GraphQL\rec\query example.png)
+```markdown
+Operation type: 可以查询(Query)、更改(mutation)、订阅(subscription)。描述了需要操作的操作类型
+
+Operation name: 描述了需要操作的名称的名字，便于在出错是查找原因和查询
+
+Variable definitions: 声明要提供的变量类型的地方，GraphQL是静态类型的，它可以验证你是传递正确的变量
+```
+
+
 
 ####查询 / Query
 ​      格式如下：
-```graphql
+​```graphql
 query queryName{
 	operation
 }
 ```
 ​      举个例子：
-```graphql
+​```graphql
 query userQuery{
   user(id:0){
     name
@@ -298,6 +315,42 @@ mutation{
   }
 }
 ```
+####接口 / Interface
+​     类似其他语言，GraphQL也有接口的概念，方便查询时返回统一类型，接口是抽象的数据类型，因此只有接口的实现才有意义，如
+```graphql
+interface Animal{
+　　name: String!
+}
+type Dog implements Animal{
+　　name: String!
+　　legs: Int!
+}
+type Fish implements Animal{
+　　name: String!
+　　tailColor: String!
+}
+```
+​     上面的接口Animal有两个实现：Dog和Fish，它们都有公共字段name
+```graphql
+type Query {
+  animals:[Animal]!
+}
+```
+​     而客户端的查询需要使用下面的```Fragment```，稍后展示
+####联合 / Union
+​     联合查询，类似接口式的组合，但不要求有公共字段，使用```union```关键字来定义，如
+```graphql
+type Dog{
+　　chinaName: String!
+　　legs: Int!
+}
+type Fish{
+　　englishName: String!
+　　tailColor: String!
+}
+union Animal = Dog | Fish
+```
+​     则```Animal```可以是Dog也可以是Fish，服务端定义查询可以和上面的接口相同，客户端查询也需要使用```Fragment```，稍后展示
 ####片段 / Fragment
 ​      片段是 GraphQL 的主要组合数据结构，通过片段可以重用重复的字段选择，减少 query 中的重复内容。片段又分为 ```FragmentSpread``` 和 ```InlineFragment```
 ​      以下是没有片段的正常查询语句
@@ -345,6 +398,75 @@ fragment friendFields on User {
 }
 ```
 ​      使用片段时需要加上```...```操作符表示展开片段内容
+​      内联片段
+```graphql
+query inlineFragmentTyping {
+  profiles(handles: ["zuck", "cocacola"]) {
+    handle
+    ... on User {
+      friends {
+        count
+      }
+    }
+    ... on Page {
+      likers {
+        count
+      }
+    }
+  }
+}
+```
+​      内联片段在单个查询上会比较方便，
+​      外联片段在多个查询上更简洁，易明白
+​      如上面的接口示例，Dog和Fish都是接口Animal的实现，有接口的公共字段name，简单的内联
+```graphql
+//内联
+{
+  animals{
+    name
+    ... on Dog{
+      legs
+    }
+    ... on Fish{
+      tailColor
+    }
+  }
+  animalSearch(text:"dog"){
+    name
+    ... on Dog{
+      legs
+    }
+    ... on Fish{
+      tailColor
+    }
+  }
+}
+```
+
+```
+//外联
+{
+  animals{
+    ... animalName
+    ... dogLegs
+    ... fishTail
+  }
+  animalSearch(text:"dog"){
+    ... animalName
+    ... dogLegs
+    ... fishTail
+  }
+}
+fragment animalName on Animal {
+  name
+}
+fragment dogLegs on Dog{
+  legs
+}
+fragment fishTail on Fish{
+  tailColor
+}
+```
 
 ####指令 / Directive
 ​      指令要解决的是 query 执行时字段参数无法覆盖的情况，例如引入或者忽略某个字段。指令为 GraphQL 执行添加了更多的信息
@@ -396,26 +518,7 @@ fragment dogQuery on Dog{
 }
 
 ```
-​      内联片段
-```graphql
-query inlineFragmentTyping {
-  profiles(handles: ["zuck", "cocacola"]) {
-    handle
-    ... on User {
-      friends {
-        count
-      }
-    }
-    ... on Page {
-      likers {
-        count
-      }
-    }
-  }
-}
-```
-​      内联片段在单个查询上会比较方便，
-​      外联片段在多个查询上更简洁，易明白
+
 ##Demo编写 / Writing  Demo 
 ###前提 / Prerequisites 
 ​       环境搭建需要有```Node v6```以上的版本安装在机子上。接着需要在你的电脑上创建一个新的工程文件夹，之后在该目录下安装```GraphQL.js``` 。[注意：使用终端或者Win+R cmd]
@@ -642,14 +745,27 @@ xhr.send(JSON.stringify({
 ***
 1. 作者 王皓 文章名称 [GraphQL 介绍](https://ninghao.net/blog/2857)  
    发布时间： 2015-08-17  更新时间：  2016-10-08
+
 2. 作者 局长 文章名称[Github 为什么开放了一套 GraphQL 版本的 API](http://www.oschina.net/news/78302/why-github-open-graphql-api)
    发布时间：2016-10-23
+
 3. Github 项目名称：[graphql.github.io](https://github.com/graphql/graphql.github.io)  ， 内有Facebook提供的```GraphQL``` 官方文档
+
 4. 作者 黯羽轻扬  文章名称：[GraphQL](http://www.tuicool.com/articles/RjquMfj)
    发布时间：2017-06-10
+
 5. Github 文章名称：[The GitHub GraphQL API](https://githubengineering.com/the-github-graphql-api/)
    更新时间：2016-09-14
+
 6. Github 文章名称：[Event-stream based GraphQL subscriptions.md](https://gist.github.com/OlegIlyenko/a5a9ab1b000ba0b5b1ad)
+
 7. 作者 Sashko Stubailo 文章名称：[The Anatomy of a GraphQL Query](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747)
 
 
+   发布时间：2017-03-08
+
+8. 作者 翟前锋 文章名称：[GraphQL系列二 数据类型](http://www.zhaiqianfeng.com/2017/06/learn-graphql-type-system.html)
+   发布时间：2017-06-06
+
+9. 作者 Taobao FED 文章名称：[深入理解 GraphQL](http://www.tuicool.com/articles/EJF7bez)
+   发布时间：2016-03-10
