@@ -1,4 +1,5 @@
-# GraphQL
+# The Research Report on GraphQL
+
 
 Author :  CYann
 No. : 31401417
@@ -244,12 +245,6 @@ mutation：获取数据后还有写操作的请求
 ```
 
 ​      这边引用了```APOLLO 社区```博主的文章内容[7]，来更好的理解关键的语法点（PS：纯个人翻译，翻译错误，请指出）：
-![解释图解](D:\CYann_Work\Js_GraphQL\rec\query query.png)
-```markdown
-Field: 请求的数据单位，它最终作为JSON响应数据中的一个字段。
-
-Arguments: 连接到特定字段的一组键值对。这些被传递到这个字段的服务器端执行，并影响它如何解决。参数可以是文字值，如上面的查询或变量。注意，参数可以出现在任何字段上，甚至可以在操作中嵌套在字段中。
-```
 ![解释图解](D:\CYann_Work\Js_GraphQL\rec\query example.png)
 ```markdown
 Operation type: 可以查询(Query)、更改(mutation)、订阅(subscription)。描述了需要操作的操作类型
@@ -263,13 +258,19 @@ Variable definitions: 声明要提供的变量类型的地方，GraphQL是静态
 
 ####查询 / Query
 ​      格式如下：
-​```graphql
+```graphql
 query queryName{
 	operation
 }
 ```
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\query query.png)
+```markdown
+Field: 请求的数据单位，它最终作为JSON响应数据中的一个字段。
+
+Arguments: 连接到特定字段的一组键值对。这些被传递到这个字段的服务器端执行，并影响它如何解决。参数可以是文字值，如上面的查询或变量。注意，参数可以出现在任何字段上，甚至可以在操作中嵌套在字段中。
+```
 ​      举个例子：
-​```graphql
+```graphql
 query userQuery{
   user(id:0){
     name
@@ -351,7 +352,7 @@ type Fish{
 }
 union Animal = Dog | Fish
 ```
-​     则```Animal```可以是Dog也可以是Fish，服务端定义查询可以和上面的接口相同，客户端查询也需要使用```Fragment```，稍后展示
+​      则```Animal```可以是Dog也可以是Fish，服务端定义查询可以和上面的接口相同，客户端查询也需要使用```Fragment```，稍后展示
 ####片段 / Fragment
 ​      片段是 GraphQL 的主要组合数据结构，通过片段可以重用重复的字段选择，减少 query 中的重复内容。片段又分为 ```FragmentSpread``` 和 ```InlineFragment```
 ​      以下是没有片段的正常查询语句
@@ -402,6 +403,7 @@ fragment friendFields on User {
 ![解释图解](D:\CYann_Work\Js_GraphQL\rec\fragment.png)
 ```markdown
 Fragment name: 每个片段的名字有一个graphql文件内是独一无二的。这是用于引用操作中或其他片段中的片段的名称。碎片名称也可以用于服务器端日志记录，类似于操作名，因此我们建议使用显式和有意义的名称。如果你把你的片段命名得很好，你可以追踪你的代码中哪一部分定义了这个片段，如果你想优化你以后的数据。
+
 Type condition: graphql操作总是在查询(query)，更改(mutation)，或订阅(subscription)类型在您的架构，但片段可以用于任何选择集。因此，为了孤立地对您的模式进行验证，您需要指定它可以使用的类型，这就是类型条件出现的地方。
 ```
 ​      内联片段
@@ -1008,7 +1010,8 @@ console.log('Running a GraphQL API server at localhost:4000/graphql');
 
 ##总结 / Summarize  
 
-GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱动应用
+GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱动应用。乍看 GraphQL 可能很复杂，因为它是一种跨领域技术。但是，如果你花时间了解基础概念，我想你会发现很多东西只是有意义的。所以无论你是否真的使用它，我相信值得花时间熟悉 GraphQL。越来越多的公司和框架正在采用它，并且在未来几年内可能最终成为网络的关键组成部分之一。
+
 ***
 ***
 1. 作者 王皓 文章名称 ：[GraphQL 介绍](https://ninghao.net/blog/2857)  
@@ -1028,8 +1031,6 @@ GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱�
 6. Github 文章名称：[Event-stream based GraphQL subscriptions.md](https://gist.github.com/OlegIlyenko/a5a9ab1b000ba0b5b1ad)
 
 7. 作者 Sashko Stubailo 文章名称：[The Anatomy of a GraphQL Query](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747)
-
-
    发布时间：2017-03-08
 
 8. 作者 翟前锋 文章名称：[GraphQL系列二 数据类型](http://www.zhaiqianfeng.com/2017/06/learn-graphql-type-system.html)
@@ -1037,3 +1038,17 @@ GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱�
 
 9. 作者 Taobao FED 文章名称：[深入理解 GraphQL](http://www.tuicool.com/articles/EJF7bez)
    发布时间：2016-03-10
+10. 文章名称：Getting Started With GraphQL.js _ GraphQL.js Tutorial
+11. 文章名称：Basic Types _ GraphQL.js Tutorial
+12. 文章名称：Running an Express GraphQL Server _ GraphQL.js Tutorial
+13. 文章名称：GraphQL Clients _ GraphQL.js Tutorial
+14. 文章名称：Passing Arguments _ GraphQL.js Tutorial
+15. 文章名称：Mutations and Input Types _ GraphQL.js Tutorial
+16. 文章名称：Constructing Types _ Advanced Guides
+17. 
+
+
+
+
+
+
