@@ -1,7 +1,7 @@
 # GraphQL
 
 Author :  CYann
-No : 31401417
+No. : 31401417
 Teacher: Huomm
 Publication time : 2017-06-11
 >积一时之跬步，臻千里之遥程
