@@ -1038,14 +1038,20 @@ GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱�
 
 9. 作者 Taobao FED 文章名称：[深入理解 GraphQL](http://www.tuicool.com/articles/EJF7bez)
    发布时间：2016-03-10
+   
 10. 文章名称：Getting Started With GraphQL.js _ GraphQL.js Tutorial
+
 11. 文章名称：Basic Types _ GraphQL.js Tutorial
+
 12. 文章名称：Running an Express GraphQL Server _ GraphQL.js Tutorial
+
 13. 文章名称：GraphQL Clients _ GraphQL.js Tutorial
+
 14. 文章名称：Passing Arguments _ GraphQL.js Tutorial
+
 15. 文章名称：Mutations and Input Types _ GraphQL.js Tutorial
+
 16. 文章名称：Constructing Types _ Advanced Guides
-17. 
 
 
 
