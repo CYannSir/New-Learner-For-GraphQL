@@ -75,8 +75,228 @@ Author CYann
 
 
 ##简介 / Introduction  
-​       GraphQL是一种查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序。
+​       GraphQL是一种应用层查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序。
 ![](D:\CYann_Work\Js_GraphQL\rec\graphql intro.png)
+
+###GraphQL 数据类型
+####标量类型 / Scala
+```Int``` ：整数，有符号的32位整型，对应 JavaScript 的 Number
+```Float``` ：浮点数，有符号的双精度浮点型，对应 JavaScript 的 Number
+```String``` ：字符串，UTF‐8字符序列，对应 JavaScript 的 String
+```Boolean ```：布尔值，对应 JavaScript 的 Boolean
+```ID``` ：ID 值，是一个序列化后值唯一的字符串，常用于获取数据的唯一标志，或缓存的键值，它也会被序列化为String，但可读性差。
+​       上述为```GraphQL 规范``` 的基本类型。以下是简单的示例，修改了测试的demo代码```server.js```：
+```javascript
+/**
+ * 基础类型测试server.js
+ */
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+//建立一个Schema ， 使用Graphql Schema 语言
+var schema = buildSchema(`
+  type Query {
+    quoteOfTheDay: String
+    random: Float!
+    rollThreeDice: [Int]
+  }
+`);
+
+//root对每一个API断点都提供了一个resolver功能
+var root = {
+  quoteOfTheDay: () => {
+    return Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within';
+  },
+  random: () => {
+    return Math.random();
+  },
+  rollThreeDice: () => {
+    return [1, 2, 3].map(_ => 1 + Math.floor(Math.random() * 6));
+  },
+};
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at localhost:4000/graphql');
+```
+
+​       查询语句如下：
+```graphql
+{
+  quoteOfTheDay
+  random
+  rollThreeDice
+}
+```
+![](D:\CYann_Work\Js_GraphQL\rec\8.png)
+
+####枚举 / Enum
+​       枚举类型是标量类型的变体，不仅适用于可验证性，还提高了维护性，它同样被序列化为String。用于表示可枚举数据结构的类型，定义形如下例子：
+```graphql
+enum Unit {
+	MM //MM代表米做单位
+	mm //mm代表毫米做单位。
+}
+```
+####对象 / Object
+​       组成Schema最常用的是对象类型,它包含各种字段。例子：定义了一个```User```对象，包含```name(名字)```、```sex(性别)```、```intro(介绍)```属性字段，而这些属性字段都是标量```String类型```，当然属性也可以是对象类型。定义如下：
+```graphql
+type User{
+　　name: String
+　　sex: String
+　　intro: String
+}
+```
+####列表 / List
+​       列表是其他类型的封装，通常用于对象字段的描述。通常用```[]```表示，示例定义如下：
+```
+type User{
+  name: String
+  sex: String
+  intro: String
+  skills: [String]
+}
+```
+​       Skills就是一个列表集合，有点类似一个数组
+####非空 / Non-Null
+​       在类型声明后，使用```!``` 声明非空，示例如下：
+```graphql
+type Query {
+  user(id:Int!):User
+}
+type User{
+  name: String!
+  sex: String
+  intro: String
+  skills: [String]!
+}
+```
+​      以上的```user```查询接口，其参数为非空的```id```。我们做以下的例子，即不传入参数```id```会怎么样
+```graphql
+query{
+  user {
+    name
+    sex
+    intro
+  }
+}
+```
+​      果不其然，反馈异常
+```JSON
+{
+  "errors": [
+    {
+      "message": "Field \"user\" argument \"id\" of type \"Int!\" is required but not provided.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ]
+    }
+  ]
+}
+```
+​      那么如果是```user```的```name```为非null，一旦服务器返回的```name```为```null```，则会反馈如下异常：
+```json
+{
+  "data": {
+    "user": null
+  },
+  "errors": [
+    {
+      "message": "Cannot return null for non-nullable field User.name.",
+      "locations": [
+        {
+          "line": 3,
+          "column": 5
+        }
+      ],
+      "path": [
+        "user",
+        "name"
+      ]
+    }
+  ]
+}
+```
+​      还需要注意一件事情，注意区别 ```skills: [String]! ```与 ```skills: [String!] ```两种写法的区别
+```markdown
+skills: [String]!：List不能为null
+skills: [String!]：List元素不能为null
+```
+####操作 / Operation
+​      操作的请求模型[6]，如下图所示：
+![](D:\CYann_Work\Js_GraphQL\rec\query.svg)
+​      上图所示，```GraphQL 规范```有两种操作
+```markdown
+query：仅获取数据（fetch）的只读请求
+mutation：获取数据后还有写操作的请求
+```
+####查询 / Query
+​      格式如下：
+```graphql
+query queryName{
+	operation
+}
+```
+​      举个例子：
+```graphql
+query userQuery{
+  user(id:0){
+    name
+    sex
+    stature
+  }
+  users{
+    name
+    sex
+    stature
+  }
+}
+```
+​      再精简一点：
+```graphql
+{
+  user(id:0){
+    name
+    sex
+    stature
+  }
+  users{
+    name
+    sex
+    stature
+  }
+}
+```
+​      这边引用了```APOLLO 社区```博主的文章内容[7]，来更好的理解关键的语法点（PS：纯个人翻译，翻译错误，请指出）：
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\query example.png)
+
+
+####维护 / Mutation
+​     ```Mutataion```用来维护数据的，格式和查询类似，如下：
+```graphql
+mutation mutationName{
+	operation
+}
+```
+​      ```Mutaion```关键字是不可以省略的，否则被认为是Query而找不到操作名，举个例子:
+```graphql
+mutation{
+  addUser(name:"testUser",sex:"男",intro:"简介",skills:[]){
+    name
+    sex
+    intro
+  }
+}
+```
 
 https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
 
@@ -313,4 +533,7 @@ xhr.send(JSON.stringify({
    发布时间：2017-06-10
 5. Github 文章名称：[The GitHub GraphQL API](https://githubengineering.com/the-github-graphql-api/)
    更新时间：2016-09-14
+6. Github 文章名称：[Event-stream based GraphQL subscriptions.md](https://gist.github.com/OlegIlyenko/a5a9ab1b000ba0b5b1ad)
+7. 作者 Sashko Stubailo 文章名称：[The Anatomy of a GraphQL Query](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747)
+
 
