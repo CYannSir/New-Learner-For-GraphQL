@@ -239,6 +239,10 @@ skills: [String!]：List元素不能为null
 query：仅获取数据（fetch）的只读请求
 mutation：获取数据后还有写操作的请求
 ```
+
+​      这边引用了```APOLLO 社区```博主的文章内容[7]，来更好的理解关键的语法点（PS：纯个人翻译，翻译错误，请指出）：
+![解释图解](D:\CYann_Work\Js_GraphQL\rec\query example.png)
+
 ####查询 / Query
 ​      格式如下：
 ```graphql
@@ -276,9 +280,6 @@ query userQuery{
   }
 }
 ```
-​      这边引用了```APOLLO 社区```博主的文章内容[7]，来更好的理解关键的语法点（PS：纯个人翻译，翻译错误，请指出）：
-![解释图解](D:\CYann_Work\Js_GraphQL\rec\query example.png)
-
 
 ####维护 / Mutation
 ​     ```Mutataion```用来维护数据的，格式和查询类似，如下：
@@ -297,10 +298,125 @@ mutation{
   }
 }
 ```
+####片段 / Fragment
+​      片段是 GraphQL 的主要组合数据结构，通过片段可以重用重复的字段选择，减少 query 中的重复内容。片段又分为 ```FragmentSpread``` 和 ```InlineFragment```
+​      以下是没有片段的正常查询语句
+```graphql
+query noFragments {
+  user(id: 4) {
+    friends(first: 10) {
+      id
+      name
+      profilePic(size: 50)
+    }
+    mutualFriends(first: 10) {
+      id
+      name
+      profilePic(size: 50)
+    }
+  }
+}
+```
+​      可以发现重复选择集合：
+```graphql
+{
+  id
+  name
+  profilePic(size: 50)
+}
+```
+​      通过片段的概念，可以简化查询，如下：
+```graphql
+query withFragments {
+  user(id: 4) {
+    friends(first: 10) {
+      ...friendFields
+    }
+    mutualFriends(first: 10) {
+      ...friendFields
+    }
+  }
+}
 
-https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
+fragment friendFields on User {
+  id
+  name
+  profilePic(size: 50)
+}
+```
+​      使用片段时需要加上```...```操作符表示展开片段内容
 
-##测试Demo编写 / Writing code for a Demo 
+####指令 / Directive
+​      指令要解决的是 query 执行时字段参数无法覆盖的情况，例如引入或者忽略某个字段。指令为 GraphQL 执行添加了更多的信息
+```markdown
+fragment @skip(if: $isTrue) 当$isTrue为真(true)时不使用fragment；
+fragment @include(if: $isTrue) 当$isTrue为真(true)时使用fragment；
+```
+​      参数变量是通过```query```或```mutation```传递的；变量形如```$withName:Boolean!```，以```$```开头，以类型结尾，类型必须是标量(scalar)、枚举(enum)或输入类型(input)
+```graphql
+query(
+  $noWithDog:Boolean!,
+  $withName:Boolean!,
+  $withFish:Boolean!
+){
+  animals{
+    name @include(if:$withName)
+      ... dogQuery @skip(if:$noWithDog)
+      ... on Fish @include(if:$withFish){
+      tailColor
+    }
+  }
+}
+fragment dogQuery on Dog{
+  legs 
+}
+```
+​      传入参数```$noWithDog(是否带着狗狗)```、```$withName(是否带着Name)```、```$withFish(是否带着鱼儿)```参数变量
+```graphql
+{
+  "noWithDog": true,
+  "withName": true,
+  "withFish": true
+}
+```
+​      查询结果
+```json
+{
+  "data": {
+    "animals": [
+      {
+        "name": "dog"
+      },
+      {
+        "name": "fish",
+        "tailColor": "red"
+      }
+    ]
+  }
+}
+
+```
+​      内联片段
+```graphql
+query inlineFragmentTyping {
+  profiles(handles: ["zuck", "cocacola"]) {
+    handle
+    ... on User {
+      friends {
+        count
+      }
+    }
+    ... on Page {
+      likers {
+        count
+      }
+    }
+  }
+}
+```
+​      内联片段在单个查询上会比较方便，
+​      外联片段在多个查询上更简洁，易明白
+##Demo编写 / Writing  Demo 
 ###前提 / Prerequisites 
 ​       环境搭建需要有```Node v6```以上的版本安装在机子上。接着需要在你的电脑上创建一个新的工程文件夹，之后在该目录下安装```GraphQL.js``` 。[注意：使用终端或者Win+R cmd]
 ```
