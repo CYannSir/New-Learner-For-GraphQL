@@ -27,11 +27,30 @@ Author CYann
 
 ​	2017-6-9-晚 对```GraphQL``` 官方文档进行细致翻译和研究
 
-​	2017-6-10-A
+​	2017-6-10-A 写入测试Demo
 
 ​	2017-6-11-A
 
 ###技术背景
+####Web早期
+​        早期的Web应用就是```静态HTML文档```。演化到网站想包含存在数据库（例如SQL）里的动态内容，并通过```JavaScript```来添加交互功能。绝大多数的Web内容都通过桌面电脑的Web浏览器来访问的，看起来一切都很美好
+![](D:\CYann_Work\Js_GraphQL\rec\web早期.png)
+
+####REST: API
+​        快进到2007年Steve Jobs介绍iPhone的时候，除了智能手机对世界、文化和交流的深远影响，也让开发者的工作变复杂了很多。智能手机破坏了开发现状，短短几年后，我们突然就有了桌面电脑、iPhone、Android和平板电脑
+​        作为回应，开发者开始用```RESTful API```给形状各异、尺寸不同的应用提供数据，新的开发模型差不多是这样：
+![](D:\CYann_Work\Js_GraphQL\rec\REST API.png)
+
+​        旧式 REST 模型如下图所示，先订购比萨饼，然后请商店送货上门，接着再打电话给干衣店上门取衣服。三个店铺，三个电话。
+![](D:\CYann_Work\Js_GraphQL\rec\REST Example.png)
+
+####GraphQL: API
+​        GraphQL是一种API查询语言，由Facebook设计并开源。可以把GraphQL当做REST的备选项来构建API，而REST是一种概念模型，可以用来设计和实现API。GraphQL是一种标准化的语言、type系统和在客户端和服务器之间建立起强约定的规范定义。让所有设备之间通信有了一套标准语言，简化了创建大型跨平台应用的过程
+​        用GraphQL的话，图就变成了这样子:
+![](D:\CYann_Work\Js_GraphQL\rec\GRAPHQL.png)
+
+​        GraphQL 就像一个私人助理。只需要给出三个地方的地址，然后告诉 Ta 你想要什么（“衣服要干洗，一个大比萨饼，两打鸡蛋” ），然后就可以坐等结果了。
+![](D:\CYann_Work\Js_GraphQL\rec\Grapql example.png)
 
 ​        在 2015 React 欧洲大会上，Lee Byron 介绍了 Facebook 的 GraphQL ，包含 GraphQL 背后的故事，查询语句的示例，还有核心的概念。  
 
@@ -51,13 +70,13 @@ Author CYann
 
 ​	在2016，```Github```宣布开放了一套使用```GraphQL```开发的公共```API``` [2]，以下为```Github``` 宣布使用```GraphQL``` 的告示：
 
-> We’ve often heard that our REST API was an inspiration for other companies; countless tutorials refer to our endpoints. Today, we’re excited to announce our biggest change to the API since we snubbed XML in favor of JSON: we’re making the GitHub API available through GraphQL.																		                                                                                                                                      ——Github
+> We’ve often heard that our REST API was an inspiration for other companies; countless tutorials refer to our endpoints. Today, we’re excited to announce our biggest change to the API since we snubbed XML in favor of JSON: we’re making the GitHub API available through GraphQL.																		                                                                                                                                      ——Github[5]
 
 
 
 ##简介 / Introduction  
-​       GraphQL是一种查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序
-
+​       GraphQL是一种查询语言的设计提供了一个直观并且灵活的描述他们的数据请求和互动的语法和系统来建立客户端应用程序。
+![](D:\CYann_Work\Js_GraphQL\rec\graphql intro.png)
 
 https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747
 
@@ -286,11 +305,12 @@ xhr.send(JSON.stringify({
 ---
 ***
 1. 作者 王皓 文章名称 [GraphQL 介绍](https://ninghao.net/blog/2857)  
-   发布时间 2015-08-17  更新时间  2016-10-08
+   发布时间： 2015-08-17  更新时间：  2016-10-08
 2. 作者 局长 文章名称[Github 为什么开放了一套 GraphQL 版本的 API](http://www.oschina.net/news/78302/why-github-open-graphql-api)
-   发布时间2016-10-23
+   发布时间：2016-10-23
 3. Github 项目名称：[graphql.github.io](https://github.com/graphql/graphql.github.io)  ， 内有Facebook提供的```GraphQL``` 官方文档
-
-
-
+4. 作者 黯羽轻扬  文章名称：[GraphQL](http://www.tuicool.com/articles/RjquMfj)
+   发布时间：2017-06-10
+5. Github 文章名称：[The GitHub GraphQL API](https://githubengineering.com/the-github-graphql-api/)
+   更新时间：2016-09-14
 
