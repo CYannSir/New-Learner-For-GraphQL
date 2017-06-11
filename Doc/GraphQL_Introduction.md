@@ -752,9 +752,264 @@ xhr.send(JSON.stringify({
 ```
 ![](D:\CYann_Work\Js_GraphQL\rec\7-2.png) 
 
+### 简单实现GraphQL的更改和写入数据 / Writing Code 
+​      使用```Mutation```来代替```Query```，那么```Schema```中可以这样，如下：
+```graphql
+input MessageInput {
+  content: String
+  author: String
+}
+
+type Message {
+  id: ID!
+  content: String
+  author: String
+}
+
+type Query {
+  getMessage(id: ID!): Message
+}
+
+type Mutation {
+  createMessage(input: MessageInput): Message
+  updateMessage(id: ID!, input: MessageInput): Message
+}
+```
+​      当然，也需要有相应的```root resolver```：
+```javascript
+var fakeDatabase = {};
+var root = {
+  setMessage: function ({message}) {
+    fakeDatabase.message = message;
+    return message;
+  },
+  getMessage: function () {
+    return fakeDatabase.message;
+  }
+};
+```
+​      整合之后，如下：
+```javascript
+/**
+ * 更改和输入类型测试server.js
+ */
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+//建立一个Schema ， 使用Graphql Schema 语言
+var schema = buildSchema(`
+  input MessageInput {
+    content: String
+    author: String
+  }
+
+  type Message {
+    id: ID!
+    content: String
+    author: String
+  }
+
+  type Query {
+    getMessage(id: ID!): Message
+  }
+
+  type Mutation {
+    createMessage(input: MessageInput): Message
+    updateMessage(id: ID!, input: MessageInput): Message
+  }
+`);
+
+// 将消息赋值在这个对象上
+class Message {
+  constructor(id, {content, author}) {
+    this.id = id;
+    this.content = content;
+    this.author = author;
+  }
+}
+
+var fakeDatabase = {};
+//root对每一个API断点都提供了一个resolver功能
+var root = {
+  getMessage: function ({id}) {
+    if (!fakeDatabase[id]) {
+      throw new Error('no message exists with id ' + id);
+    }
+    return new Message(id, fakeDatabase[id]);
+  },
+  createMessage: function ({input}) {
+    //创建一个随机的id赋给我们创建Schema
+    var id = require('crypto').randomBytes(10).toString('hex');
+
+    fakeDatabase[id] = input;
+    return new Message(id, input);
+  },
+  updateMessage: function ({id, input}) {
+    if (!fakeDatabase[id]) {
+      throw new Error('no message exists with id ' + id);
+    }
+    //替换掉所有的旧的数据
+    fakeDatabase[id] = input;
+    return new Message(id, input);
+  },
+}
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000, () => {
+  console.log('Running a GraphQL API server at localhost:4000/graphql');
+});
+
+```
+​      在graphql查询使用关键字```mutation```（PS：在介绍中也声明了，不使用关键字，默认为```query```）。若要传递输入类型，写入的数据设置为JSON对象。例如，通过上面定义的```Schema```，您可以创建一个新消息，并用此操作返回新消息的ID
+```graphql
+mutation {
+  createMessage(input: {
+    author: "andy",
+    content: "hope is a good thing",
+  }) {
+    id
+  }
+}
+```
+![](D:\CYann_Work\Js_GraphQL\rec\9.png) 
+​      当然使用相应的客户端用法代码也是可行的，如下：
+```javascript
+var author = 'andy';
+var content = 'hope is a good thing';
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open("POST", "/graphql");
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Accept", "application/json");
+xhr.onload = function () {
+  console.log('data returned:', xhr.response);
+}
+var query = `mutation CreateMessage($input: MessageInput) {
+  createMessage(input: $input) {
+    id
+  }
+}`;
+xhr.send(JSON.stringify({
+  query: query,
+  variables: {
+    input: {
+      author: author,
+      content: content,
+    }
+  }
+}));
+```
+###进阶 / Advanced
+​      使用```GraphQLSchema```的构造器来创建一个```schema```是一个进阶的方法。那么我们进行一个比较学习，如下为原来的定义方法：
+```JavaScript
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+var schema = buildSchema(`
+  type User {
+    id: String
+    name: String
+  }
+
+  type Query {
+    user(id: String): User
+  }
+`);
+
+// Maps id to User object
+var fakeDatabase = {
+  'a': {
+    id: 'a',
+    name: 'alice',
+  },
+  'b': {
+    id: 'b',
+    name: 'bob',
+  },
+};
+
+var root = {
+  user: function ({id}) {
+    return fakeDatabase[id];
+  }
+};
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at localhost:4000/graphql');
+```
+
+​      使用```GraphQLSchema```的构造器，如下：
+```JavaScript
+var express = require('express');
+var graphqlHTTP = require('express-graphql');
+var graphql = require('graphql');
+
+var fakeDatabase = {
+  'a': {
+    id: 'a',
+    name: 'alice',
+  },
+  'b': {
+    id: 'b',
+    name: 'bob',
+  },
+};
+
+// 定义用户类型
+var userType = new graphql.GraphQLObjectType({
+  name: 'User',
+  fields: {
+    id: { type: graphql.GraphQLString },
+    name: { type: graphql.GraphQLString },
+  }
+});
+
+// 定义查询类型
+var queryType = new graphql.GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    user: {
+      type: userType,
+      // `args` describes the arguments that the `user` query accepts
+      args: {
+        id: { type: graphql.GraphQLString }
+      },
+      resolve: function (_, {id}) {
+        return fakeDatabase[id];
+      }
+    }
+  }
+});
+
+var schema = new graphql.GraphQLSchema({query: queryType});
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  graphiql: true,
+}));
+app.listen(4000);
+console.log('Running a GraphQL API server at localhost:4000/graphql');
+```
+​      可见```root resolver```直接实现了```query```和```mutation```类，并没有使用```root``` 我个人认为，这样更加直接了当，更加简洁明了
+
 ##总结 / Summarize  
 
----
+GraphQL提供了一些自用的强大工具集，用来构建高效的数据驱动应用
+***
 ***
 1. 作者 王皓 文章名称 ：[GraphQL 介绍](https://ninghao.net/blog/2857)  
    发布时间： 2015-08-17  更新时间：  2016-10-08
